@@ -10,19 +10,19 @@
         /* ================= ESTÉTICA FUTURISTA (SCI-FI) ================= */
         body { 
             font-family: 'Poppins', sans-serif; 
-            margin: 0; padding: 15px; /* Reducido para dar más espacio a la tarjeta */
+            margin: 0; padding: 15px; 
             display: flex; justify-content: center; align-items: center; min-height: 100vh;
             background-color: #0b0f19;
             background-image: 
                 radial-gradient(circle at 15% 50%, rgba(0, 210, 255, 0.08), transparent 25%),
                 radial-gradient(circle at 85% 30%, rgba(0, 255, 136, 0.08), transparent 25%);
             color: #e2e8f0;
-            overflow-x: hidden; /* Previene scroll horizontal accidental */
+            overflow-x: hidden; 
         }
 
         .card { 
             background: rgba(15, 23, 42, 0.7); 
-            padding: 25px 15px; /* Padding interno reducido */
+            padding: 25px 15px; 
             border-radius: 16px; 
             border: 1px solid rgba(0, 210, 255, 0.3);
             box-shadow: 0 0 30px rgba(0, 210, 255, 0.15), inset 0 0 20px rgba(0, 210, 255, 0.05);
@@ -30,7 +30,7 @@
             text-align: center;
             backdrop-filter: blur(12px);
             transition: all 0.3s ease;
-            box-sizing: border-box; /* Asegura que el padding no desborde el ancho */
+            box-sizing: border-box; 
         }
 
         .progress-bar { width: 100%; background-color: #1e293b; border-radius: 10px; height: 6px; margin-bottom: 20px; box-shadow: inset 0 0 5px #000;}
@@ -54,7 +54,7 @@
 
         /* Botones Neón */
         .btn { 
-            width: 100%; padding: 12px; margin: 6px 0; /* Botones más delgados */
+            width: 100%; padding: 12px; margin: 6px 0; 
             border: 1px solid rgba(0, 210, 255, 0.4); 
             border-radius: 10px; background-color: rgba(0, 210, 255, 0.05); 
             font-size: 0.9rem; font-weight: 600; color: #00d2ff; 
@@ -106,7 +106,7 @@
         .shake { animation: shake 0.4s; }
         @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
 
-        /* REGLAS ESPECÍFICAS PARA PANTALLAS MUY PEQUEÑAS (iPhone SE, Androids compactos) */
+        /* REGLAS ESPECÍFICAS PARA PANTALLAS MUY PEQUEÑAS */
         @media (max-width: 380px) {
             body { padding: 10px; }
             .card { padding: 20px 10px; }
@@ -154,7 +154,7 @@
 
         <div id="encuesta" style="display: none;">
             <div class="progress-bar"><div class="progress" id="barraProgreso"></div></div>
-            <h2 id="numPregunta">NIVEL 1/10</h2>
+            <h2 id="numPregunta">NIVEL 1/20</h2>
             <p class="enunciado" id="textoPregunta">Cargando datos espaciales...</p>
             
             <div id="opciones"></div>
@@ -167,19 +167,17 @@
     </div>
 
     <script>
-       // ==========================================
+        // ==========================================
         // 1. SISTEMA DE AUDIO (MP3 EXTERNO + EFECTOS SINTÉTICOS)
         // ==========================================
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         let audioCtx;
 
-        // Instanciamos el audio. Asegúrate de que el nombre coincida con tu archivo
         const pistaFondo = new Audio('musica-mision.mp3'); 
-        pistaFondo.loop = true; // Activa el bucle infinito
-        pistaFondo.volume = 0.15; // Volumen al 15% para no desconcentrar la lectura
+        pistaFondo.loop = true; 
+        pistaFondo.volume = 0.15; 
 
         function iniciarMusicaFondo() {
-            // El catch evita errores en consola si el navegador demora en cargar el archivo
             pistaFondo.play().catch(error => {
                 console.log("Audio en espera de carga o interacción: ", error);
             });
@@ -187,11 +185,10 @@
 
         function detenerMusicaFondo() {
             pistaFondo.pause();
-            pistaFondo.currentTime = 0; // Reinicia la pista a cero
+            pistaFondo.currentTime = 0; 
         }
 
         function reproducirSonido(tipo) {
-            // Mantenemos la generación sintética para los efectos de la interfaz
             if (!audioCtx) audioCtx = new AudioContext();
             if (audioCtx.state === 'suspended') audioCtx.resume();
             
@@ -200,7 +197,15 @@
             osc.connect(gain);
             gain.connect(audioCtx.destination);
 
-            if (tipo === 'correcto') {
+            if (tipo === 'inicio') {
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.4); 
+                gain.gain.setValueAtTime(0, audioCtx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.2, audioCtx.currentTime + 0.1);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.4);
+            } else if (tipo === 'correcto') {
                 osc.type = 'sine';
                 osc.frequency.setValueAtTime(880, audioCtx.currentTime);
                 osc.frequency.exponentialRampToValueAtTime(1760, audioCtx.currentTime + 0.1);
@@ -232,9 +237,11 @@
         const database = firebase.database();
 
         // ==========================================
-        // 3. BASE DE DATOS DE PREGUNTAS
+        // ==========================================
+        // 3. BASE DE DATOS DE PREGUNTAS (20 NIVELES)
         // ==========================================
         const preguntas = [
+            // --- NIVELES 1 AL 10 (Conceptos Básicos e Intermedios) ---
             { 
                 texto: "¿Cual es la principal diferencia entre la fisica clasica y la moderna?", 
                 opciones: ["La clasica no usa matematicas", "La moderna estudia fenomenos a velocidad de la luz o nivel atomico", "La moderna rechaza la gravedad", "Son lo mismo"], 
@@ -281,17 +288,77 @@
                 respuestaCorrecta: 2 
             },
             { 
-                texto: "Si dos vectores son PERPENDICULARES (90°) y miden 3u y 4u. ¿Cual es su vector resultante?", 
-                opciones: ["7 u", "1 u", "12 u", "5 u"], 
-                respuestaCorrecta: 3, pista: "Como forman 90 grados, debes usar el Teorema de Pitagoras: R² = A² + B²"
+                texto: "Si un vector va hacia el Norte con 10u y otro va hacia el Sur con 4u. ¿Cual es el vector resultante?", 
+                opciones: ["14 u al Norte", "6 u al Sur", "6 u al Norte", "0 u"], 
+                respuestaCorrecta: 2, pista: "Al estar en la misma linea pero en sentidos opuestos, se restan. La resultante apunta hacia donde iba el vector mayor."
+            },
+
+            // --- NIVELES 11 AL 14 (Dificultad Avanzada - Teórica) ---
+            { 
+                texto: "¿Cual de las siguientes magnitudes fisicas es de tipo VECTORIAL (necesita direccion y sentido obligatoriamente)?", 
+                opciones: ["La masa", "El tiempo", "La fuerza", "La temperatura"], 
+                respuestaCorrecta: 2, pista: "Recuerda que no es lo mismo empujar una caja hacia la derecha que hacia la izquierda, pero el tiempo avanza igual hacia un solo lado."
+            },
+            { 
+                texto: "En el Sistema Internacional (SI), el prefijo 'kilo' (k) significa 1000 veces la unidad base. ¿Que prefijo significa la milesima parte (1/1000) o 10⁻³ de la unidad?", 
+                opciones: ["Centi (c)", "Mili (m)", "Micro (µ)", "Mega (M)"], 
+                respuestaCorrecta: 1, pista: "Piensa en como se le llama a la milesima parte de un metro o un litro."
+            },
+            { 
+                texto: "Sabiendo que la aceleracion es la variacion de velocidad sobre el tiempo (a = v/t), ¿cual es su ecuacion dimensional?", 
+                opciones: ["L T⁻¹", "L T⁻²", "M L T⁻²", "L² T⁻¹"], 
+                respuestaCorrecta: 1, pista: "Divide la dimension de velocidad (L T⁻¹) entre la dimension de tiempo (T). Al subir, los exponentes se restan: -1 - 1."
+            },
+            { 
+                texto: "Segun el Principio de Homogeneidad Dimensional, en la ecuacion A = B + C, ¿que se debe cumplir?", 
+                opciones: ["A, B y C deben tener diferentes dimensiones", "La dimension de A es igual a la de B y C por separado", "B y C se multiplican", "La dimension de A es cero"], 
+                respuestaCorrecta: 1, pista: "Solo puedes sumar objetos de la misma especie. Si B es longitud y C es longitud, A tambien debe ser longitud obligatoriamente."
+            },
+
+            // --- NIVELES 15 AL 20 (Dificultad Avanzada - CÁLCULOS LINEALES SIMPLES) ---
+            { 
+                texto: "Un bloque es empujado hacia la derecha con una fuerza de 30 N y hacia la izquierda con una fuerza de 10 N. ¿Cual es el modulo y direccion del vector resultante?", 
+                opciones: ["20 N hacia la derecha", "40 N hacia la derecha", "20 N hacia la izquierda", "30 N hacia la izquierda"], 
+                respuestaCorrecta: 0, pista: "Vectores en la misma linea y sentidos opuestos se restan (30 - 10), y la resultante apunta en el sentido de la fuerza mayor."
+            },
+            { 
+                texto: "Si la densidad (D) se define como Masa sobre Volumen (D = M/V), ¿cual es su ecuacion dimensional correcta?", 
+                opciones: ["M L⁻³", "M L³", "M L T⁻¹", "L⁻³"], 
+                respuestaCorrecta: 0, pista: "La masa es M. El volumen es Longitud al cubo (L³). Al subir el volumen del denominador al numerador, su exponente cambia de signo."
+            },
+            { 
+                texto: "Tres vectores colineales actuan sobre un cuerpo: 15u a la derecha, 5u a la derecha y 8u a la izquierda. ¿Cual es el modulo de la resultante?", 
+                opciones: ["12 u", "28 u", "10 u", "20 u"], 
+                respuestaCorrecta: 0, pista: "Suma los vectores que van en el mismo sentido (derecha) y luego restale el que va en sentido contrario (izquierda): 15 + 5 - 8."
+            },
+            { 
+                texto: "En la formula fisica A = B + C, si sabemos que 'A' representa una Distancia (L), ¿cual es la ecuacion dimensional obligatoria de 'C'?", 
+                opciones: ["L", "L²", "M", "T"], 
+                respuestaCorrecta: 0, pista: "El principio de homogeneidad dicta que solo se pueden sumar magnitudes iguales. Si el total es distancia, las partes que se suman deben ser distancia."
+            },
+            { 
+                texto: "Si la distancia entre dos colegios es de 5.5 kilometros, ¿cual es su equivalencia en el Sistema Internacional (SI) expresada en metros?", 
+                opciones: ["5500 m", "550 m", "55 m", "55000 m"], 
+                respuestaCorrecta: 0, pista: "El prefijo 'kilo' equivale a multiplicar por 1000. Multiplica 5.5 por 1000."
+            },
+            { 
+                texto: "Dos vectores tienen una resultante maxima de 25 u (cuando van en el mismo sentido) y una resultante minima de 5 u (cuando van en sentidos opuestos). ¿Cuales son los valores de esos vectores?", 
+                opciones: ["15 u y 10 u", "20 u y 5 u", "12 u y 13 u", "25 u y 5 u"], 
+                respuestaCorrecta: 0, pista: "Busca en las opciones cuales dos numeros sumados te dan 25 (Resultante Maxima) y restados te dan 5 (Resultante Minima)."
             }
         ];
-
+        
         let preguntaActual = 0;
         let tiempoInicioPregunta = 0;
         let intentosEnPreguntaActual = 0;
         let temporizadorAyuda;
         
+        // === MÉTRICAS GLOBALES PARA LA IA ===
+        let totalAciertosGlobal = 0;
+        let rachaActual = 0;
+        let rachaMaxima = 0;
+        let tiempoTotalMision = 0;
+        let intentosTotalesGlobal = 0;
     
         // ==========================================
         // 4. CONTROLADOR DE LA MISIÓN Y BASE DE DATOS
@@ -307,25 +374,21 @@
                 return;
             }
 
-            // ============================================================
-            // SIMULACIÓN DE AUTO_INCREMENT (SQL) CON TRANSACCIONES NO-SQL
-            // ============================================================
+            reproducirSonido('inicio');
+
             let contadorRef = database.ref('metadata/total_estudiantes');
 
-            // La transacción lee el valor actual en la nube y le suma 1 de forma segura
             contadorRef.transaction(function(valorActual) {
                 return (valorActual || 0) + 1;
             }, function(error, guardado, snapshot) {
                 if (error) {
                     console.error("Error de sincronización.", error);
-                    // Respaldo de emergencia si falla el internet
                     perfilAlumno.id_sesion = "ESTUDIANTE_R" + Math.floor(Math.random() * 1000);
                 } else if (guardado) {
-                    let numeroSecuencial = snapshot.val(); // Extrae el 1, 2, 3...
+                    let numeroSecuencial = snapshot.val(); 
                     perfilAlumno.id_sesion = "ESTUDIANTE_" + numeroSecuencial;
                 }
 
-                // GUARDAR EL PERFIL CON EL NUEVO ID SECUENCIAL
                 database.ref('dataset_fisica/' + perfilAlumno.id_sesion + '/perfil').set({
                     edad: perfilAlumno.edad,
                     grado: perfilAlumno.grado,
@@ -333,7 +396,6 @@
                     inicio_timestamp: firebase.database.ServerValue.TIMESTAMP
                 });
 
-                // Iniciar la interfaz solo después de obtener el número de estudiante
                 iniciarMusicaFondo(); 
                 document.getElementById("inicio").style.display = "none";
                 document.getElementById("encuesta").style.display = "block";
@@ -384,9 +446,6 @@
             document.getElementById("btnPista").style.display = "none";
         }
 
-        // ==========================================
-        // FUNCIONES DE MODALES
-        // ==========================================
         function abrirModal(tipo, titulo = null, texto = null) {
             const modal = document.getElementById(`modal${tipo}`);
             const caja = document.getElementById(`modalCaja${tipo}`);
@@ -413,16 +472,28 @@
         }
 
        // ==========================================
-        // EVALUACIÓN Y ENVÍO A FIREBASE (DATOS LIMPIOS)
+        // EVALUACIÓN Y ENVÍO A FIREBASE (DATOS LIMPIOS Y GLOBALES)
         // ==========================================
         function evaluarRespuesta(indexSeleccionado, botonElement) {
             intentosEnPreguntaActual++;
+            intentosTotalesGlobal++; // Aumenta total global
+            
             let tiempoConsumido = (Date.now() - tiempoInicioPregunta) / 1000;
+            tiempoTotalMision += tiempoConsumido; // Aumenta tiempo total
+            
             const q = preguntas[preguntaActual];
             let esCorrecta = (indexSeleccionado === q.respuestaCorrecta);
             const card = document.getElementById("app-container");
 
-            // ESTRUCTURA LIMPIA PARA LA PREGUNTA ACTUAL
+            // EVALUACIÓN DE LA RACHA Y ACIERTOS PARA LA IA
+            if (esCorrecta) {
+                totalAciertosGlobal++;
+                rachaActual++;
+                if (rachaActual > rachaMaxima) rachaMaxima = rachaActual; 
+            } else {
+                rachaActual = 0; // Se reinicia la racha si falla
+            }
+
             let datosRespuesta = {
                 acierto: esCorrecta,
                 tiempo_segundos: parseFloat(tiempoConsumido.toFixed(2)),
@@ -430,7 +501,6 @@
                 pidio_ayuda: false
             };
 
-            // Usamos .set() en lugar de .push() para anidar la pregunta dentro del estudiante
             let rutaPregunta = 'dataset_fisica/' + perfilAlumno.id_sesion + '/respuestas/Pregunta_' + (preguntaActual + 1);
             database.ref(rutaPregunta).set(datosRespuesta);
 
@@ -457,7 +527,10 @@
         }
 
         function pedirAyuda() {
+            intentosTotalesGlobal++; 
+            rachaActual = 0; // Rompe la racha si pide ayuda
             let tiempoConsumido = (Date.now() - tiempoInicioPregunta) / 1000; 
+            tiempoTotalMision += tiempoConsumido;
             
             let datosRespuesta = {
                 acierto: false,
@@ -477,10 +550,20 @@
             if (preguntaActual < preguntas.length) {
                 cargarPregunta();
             } else {
+                // GUARDADO FINAL DEL RESUMEN PARA EL ÁRBOL DE DECISIÓN
+                let resumenIA = {
+                    total_aciertos: totalAciertosGlobal,
+                    racha_maxima: rachaMaxima,
+                    tiempo_promedio_segundos: parseFloat((tiempoTotalMision / preguntas.length).toFixed(2)),
+                    total_intentos: intentosTotalesGlobal
+                };
+                
+                database.ref('dataset_fisica/' + perfilAlumno.id_sesion + '/resumen_IA').set(resumenIA);
+
                 document.getElementById("encuesta").innerHTML = "<h2 style='color:#00ff88;'>MISION CUMPLIDA</h2><p style='color:#f8fafc; font-size:0.95rem;'>Datos sincronizados con la Base de IA. Excelente trabajo, agente.</p>";
                 document.getElementById("barraProgreso").style.width = "100%";
                 reproducirSonido("correcto");
-                if(ambientOsc) ambientOsc.stop(); 
+                if (typeof detenerMusicaFondo === "function") detenerMusicaFondo(); 
             }
         }
     </script>
