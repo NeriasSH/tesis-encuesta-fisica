@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Desafío de Física | IA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Diseño Mobile-First y Atractivo */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f0f4f8; /* Fondo suave */
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .card {
+            background: white;
+            padding: 30px 20px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        .progress-bar {
+            width: 100%;
+            background-color: #e0e0e0;
+            border-radius: 8px;
+            height: 10px;
+            margin-bottom: 20px;
+        }
+        .progress {
+            background-color: #4CAF50;
+            height: 10px;
+            border-radius: 8px;
+            width: 10%; /* Cambiará dinámicamente */
+            transition: width 0.3s ease;
+        }
+        h2 { font-size: 1.2rem; color: #2c3e50; }
+        p.enunciado { font-size: 1rem; margin-bottom: 25px; font-weight: 600;}
+        
+        /* Zonas Táctiles Grandes */
+        .btn {
+            width: 100%;
+            padding: 15px;
+            margin: 8px 0;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            background-color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #4a5568;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .btn:hover, .btn:active {
+            border-color: #3182ce;
+            background-color: #ebf8ff;
+            color: #3182ce;
+        }
+        .btn-ayuda {
+            background-color: #fff5f5;
+            border-color: #feb2b2;
+            color: #c53030;
+            margin-top: 20px;
+            display: none; /* Oculto inicialmente */
+        }
+        .btn-ayuda:hover { background-color: #fed7d7; }
+    </style>
+</head>
+<body>
+
+    <div class="card" id="app-container">
+        <div id="inicio">
+            <h2>¡Bienvenido al Desafío!</h2>
+            <p>Resuelve estos 10 ejercicios de física. Tómate tu tiempo, pero concéntrate.</p>
+            <input type="text" id="codigoAlumno" placeholder="Ingresa tu código escolar" style="width: 90%; padding: 12px; margin-bottom: 15px; border-radius: 8px; border: 1px solid #ccc;">
+            <button class="btn" style="background-color: #3182ce; color: white; border: none;" onclick="iniciarEncuesta()">Comenzar</button>
+        </div>
+
+        <div id="encuesta" style="display: none;">
+            <div class="progress-bar"><div class="progress" id="barraProgreso"></div></div>
+            <h2 id="numPregunta">Pregunta 1/10</h2>
+            <p class="enunciado" id="textoPregunta">Cargando...</p>
+            
+            <div id="opciones"></div>
+
+            <button id="btnAyuda" class="btn btn-ayuda" onclick="pedirAyuda()">Necesito reforzar este tema</button>
+        </div>
+    </div>
+
+    <script>
+        // --- BASE DE DATOS LOCAL (Preguntas) ---
+        const preguntas = [
+            {
+                texto: "Si duplicas la fuerza aplicada a una masa constante, ¿qué sucede con la aceleración?",
+                opciones: ["Se reduce a la mitad", "Se duplica", "Se cuadruplica", "Permanece igual"],
+                respuestaCorrecta: 1 // Índice del arreglo (0, 1, 2, 3)
+            },
+            // Aquí agregaremos las otras 9
+        ];
+
+        // --- VARIABLES DE MÉTRICAS ---
+        let preguntaActual = 0;
+        let tiempoInicioPregunta = 0;
+        let intentosEnPreguntaActual = 0;
+        let temporizadorAyuda;
+        let alumnoID = "";
+
+        function iniciarEncuesta() {
+            alumnoID = document.getElementById("codigoAlumno").value;
+            if(!alumnoID) return alert("Por favor ingresa tu código");
+            
+            document.getElementById("inicio").style.display = "none";
+            document.getElementById("encuesta").style.display = "block";
+            cargarPregunta();
+        }
+
+        function cargarPregunta() {
+            // Reiniciar métricas para esta pregunta
+            tiempoInicioPregunta = Date.now();
+            intentosEnPreguntaActual = 0;
+            document.getElementById('btnAyuda').style.display = 'none';
+            
+            // Mostrar botón de ayuda tras 45 segundos (45000 ms)
+            clearTimeout(temporizadorAyuda);
+            temporizadorAyuda = setTimeout(() => {
+                document.getElementById('btnAyuda').style.display = 'block';
+            }, 45000);
+
+            // Renderizar la interfaz
+            const q = preguntas[preguntaActual];
+            document.getElementById("numPregunta").innerText = `Pregunta ${preguntaActual + 1} de ${preguntas.length}`;
+            document.getElementById("textoPregunta").innerText = q.texto;
+            document.getElementById("barraProgreso").style.width = `${((preguntaActual) / preguntas.length) * 100}%`;
+
+            const divOpciones = document.getElementById("opciones");
+            divOpciones.innerHTML = "";
+            
+            q.opciones.forEach((opcion, index) => {
+                let btn = document.createElement("button");
+                btn.className = "btn";
+                btn.innerText = opcion;
+                btn.onclick = () => evaluarRespuesta(index);
+                divOpciones.appendChild(btn);
+            });
+        }
+
+        function evaluarRespuesta(indexSeleccionado) {
+            intentosEnPreguntaActual++;
+            let tiempoConsumido = (Date.now() - tiempoInicioPregunta) / 1000; // en segundos
+            const q = preguntas[preguntaActual];
+            
+            let esCorrecta = (indexSeleccionado === q.respuestaCorrecta);
+
+            // AQUÍ: Guardar data en Firebase (alumnoID, preguntaActual, tiempoConsumido, intentosEnPreguntaActual, esCorrecta)
+            console.log(`Guardando: Alumno ${alumnoID} | P${preguntaActual+1} | Tiempo: ${tiempoConsumido}s | Intentos: ${intentosEnPreguntaActual} | Éxito: ${esCorrecta}`);
+
+            if (esCorrecta) {
+                avanzarSiguiente();
+            } else {
+                alert("Respuesta incorrecta. Analízalo de nuevo.");
+            }
+        }
+
+        function pedirAyuda() {
+            let latenciaAyuda = (Date.now() - tiempoInicioPregunta) / 1000;
+            console.log(`Guardando: Alumno ${alumnoID} | P${preguntaActual+1} | PIDIÓ AYUDA a los ${latenciaAyuda}s`);
+            avanzarSiguiente();
+        }
+
+        function avanzarSiguiente() {
+            preguntaActual++;
+            if (preguntaActual < preguntas.length) {
+                cargarPregunta();
+            } else {
+                document.getElementById("encuesta").innerHTML = "<h2>¡Desafío Completado!</h2><p>Tus respuestas han sido enviadas. Excelente trabajo.</p>";
+                document.getElementById("barraProgreso").style.width = "100%";
+            }
+        }
+    </script>
+</body>
+</html>
