@@ -106,7 +106,15 @@
         .shake { animation: shake 0.4s; }
         @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
 
-        /* REGLAS ESPECÍFICAS PARA PANTALLAS MUY PEQUEÑAS */
+        /* REPORTE FINAL */
+        .reporte-caja {
+            background: rgba(15, 23, 42, 0.8); padding: 20px; border-radius: 10px; 
+            margin-top: 20px; border: 1px solid #00d2ff; text-align: left;
+            box-shadow: 0 0 20px rgba(0, 210, 255, 0.2);
+        }
+        .reporte-caja p { margin: 10px 0; font-size: 1rem; color: #e2e8f0; }
+        .reporte-caja b { color: #00ff88; }
+
         @media (max-width: 380px) {
             body { padding: 10px; }
             .card { padding: 20px 10px; }
@@ -168,7 +176,7 @@
 
     <script>
         // ==========================================
-        // 1. SISTEMA DE AUDIO (MP3 EXTERNO + EFECTOS SINTÉTICOS)
+        // 1. SISTEMA DE AUDIO
         // ==========================================
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         let audioCtx;
@@ -178,9 +186,7 @@
         pistaFondo.volume = 0.15; 
 
         function iniciarMusicaFondo() {
-            pistaFondo.play().catch(error => {
-                console.log("Audio en espera de carga o interacción: ", error);
-            });
+            pistaFondo.play().catch(error => console.log("Audio bloqueado temporalmente", error));
         }
 
         function detenerMusicaFondo() {
@@ -237,88 +243,57 @@
         const database = firebase.database();
 
         // ==========================================
-        // ==========================================
         // 3. BASE DE DATOS DE PREGUNTAS (20 NIVELES)
         // ==========================================
         const preguntas = [
-            // --- NIVELES 1 AL 10 (Conceptos Básicos e Intermedios) ---
-            { 
-                texto: "¿Cual es la principal diferencia entre la fisica clasica y la moderna?", 
-                opciones: ["La clasica no usa matematicas", "La moderna estudia fenomenos a velocidad de la luz o nivel atomico", "La moderna rechaza la gravedad", "Son lo mismo"], 
-                respuestaCorrecta: 1, pista: "La fisica moderna nace con Einstein (relatividad) y la cuantica (cosas minusculas)."
-            },
-            { 
-                texto: "En mediciones, ¿cual es la diferencia entre Exactitud y Precision?", 
-                opciones: ["Son sinonimos", "Exactitud es acertar al centro real; Precision es que tus medidas sean iguales entre si", "Precision es el valor real", "Solo aplica a vectores"], 
-                respuestaCorrecta: 1
-            },
-            { 
-                texto: "Segun el Sistema Internacional (SI), ¿que magnitud fisica fundamental se mide en kilogramos?", 
-                opciones: ["El peso", "La fuerza", "La masa", "La densidad"], 
-                respuestaCorrecta: 2 
-            },
-            { 
-                texto: "¿Cual de las siguientes es una magnitud derivada?", 
-                opciones: ["El tiempo", "La temperatura", "La longitud", "La velocidad"], 
-                respuestaCorrecta: 3, pista: "AYUDA DE TEORIA: Las magnitudes fundamentales son 7. Las derivadas nacen al combinar estas fundamentales. Por ejemplo, la velocidad combina longitud y tiempo."
-            },
-            { 
-                texto: "En el analisis dimensional, ¿cual es la ecuacion dimensional correcta para el AREA?", 
-                opciones: ["L", "L²", "M L", "L T"], 
-                respuestaCorrecta: 1, pista: "AYUDA DE DIMENSIONES: El area de un cuadrado es Lado x Lado. Si un lado se mide en Longitud (L)... debes multiplicar L por L."
-            },
-            { 
-                texto: "La ecuacion dimensional de la VELOCIDAD se expresa como:", 
-                opciones: ["L T⁻¹", "L T⁻²", "M L T", "L²"], 
-                respuestaCorrecta: 0, pista: "AYUDA DE DIMENSIONES: Velocidad = Distancia / Tiempo. Distancia es Longitud (L) y Tiempo es (T). Al subir la (T) del denominador, su exponente cambia de signo."
-            },
-            { 
-                texto: "Al graficar un vector, ¿que elemento nos indica especificamente hacia donde apunta (la cabeza de la flecha)?", 
-                opciones: ["El modulo", "El origen", "La direccion", "El sentido"], 
-                respuestaCorrecta: 3 
-            },
-            { 
-                texto: "Si dos vectores paralelos apuntan en el MISMO sentido y miden 3u y 4u. ¿Cual es su resultante?", 
-                opciones: ["1 u", "5 u", "7 u", "12 u"], 
-                respuestaCorrecta: 2 
-            },
-            { 
-                texto: "Dos vectores miden 5u y 5u, pero apuntan en sentidos OPUESTOS. La resultante es:", 
-                opciones: ["10 u", "25 u", "0 u", "5 u"], 
-                respuestaCorrecta: 2 
-            },
-            { 
-                texto: "Si un vector va hacia el Norte con 10u y otro va hacia el Sur con 4u. ¿Cual es el vector resultante?", 
-                opciones: ["14 u al Norte", "6 u al Sur", "6 u al Norte", "0 u"], 
-                respuestaCorrecta: 2, pista: "Al estar en la misma linea pero en sentidos opuestos, se restan. La resultante apunta hacia donde iba el vector mayor."
-            },
+            // --- NIVELES 1 AL 10 (Teoría Básica e Intermedia) ---
+            { texto: "¿Cual es la principal diferencia entre la fisica clasica y la moderna?", opciones: ["La clasica no usa matematicas", "La moderna estudia fenomenos a velocidad de la luz o nivel atomico", "La moderna rechaza la gravedad", "Son lo mismo"], respuestaCorrecta: 1, pista: "La fisica moderna nace con Einstein (relatividad) y la cuantica." },
+            { texto: "En mediciones, ¿cual es la diferencia entre Exactitud y Precision?", opciones: ["Son sinonimos", "Exactitud es acertar al centro real; Precision es que tus medidas sean iguales entre si", "Precision es el valor real", "Solo aplica a vectores"], respuestaCorrecta: 1 },
+            { texto: "Segun el Sistema Internacional (SI), ¿que magnitud fisica fundamental se mide en kilogramos?", opciones: ["El peso", "La fuerza", "La masa", "La densidad"], respuestaCorrecta: 2 },
+            { texto: "¿Cual de las siguientes es una magnitud derivada?", opciones: ["El tiempo", "La temperatura", "La longitud", "La velocidad"], respuestaCorrecta: 3, pista: "Las magnitudes derivadas nacen al combinar las fundamentales. Por ejemplo, velocidad combina longitud y tiempo." },
+            { texto: "En el analisis dimensional, ¿cual es la ecuacion dimensional correcta para el AREA?", opciones: ["L", "L²", "M L", "L T"], respuestaCorrecta: 1, pista: "El area de un cuadrado es Lado x Lado. (L x L)" },
+            { texto: "La ecuacion dimensional de la VELOCIDAD se expresa como:", opciones: ["L T⁻¹", "L T⁻²", "M L T", "L²"], respuestaCorrecta: 0, pista: "Velocidad = Distancia(L) / Tiempo(T). Al subir T, cambia de signo." },
+            { texto: "Al graficar un vector, ¿que elemento nos indica especificamente hacia donde apunta (la cabeza de la flecha)?", opciones: ["El modulo", "El origen", "La direccion", "El sentido"], respuestaCorrecta: 3 },
+            { texto: "Si dos vectores paralelos apuntan en el MISMO sentido y miden 3u y 4u. ¿Cual es su resultante?", opciones: ["1 u", "5 u", "7 u", "12 u"], respuestaCorrecta: 2 },
+            { texto: "Dos vectores miden 5u y 5u, pero apuntan en sentidos OPUESTOS. La resultante es:", opciones: ["10 u", "25 u", "0 u", "5 u"], respuestaCorrecta: 2 },
+            { texto: "Si un vector va hacia el Norte con 10u y otro va hacia el Sur con 4u. ¿Cual es el vector resultante?", opciones: ["14 u al Norte", "6 u al Sur", "6 u al Norte", "0 u"], respuestaCorrecta: 2, pista: "Vectores opuestos se restan. La flecha apunta hacia el mayor." },
 
-            // --- NIVELES 11 AL 14 (Dificultad Avanzada - Teórica) ---
-            { 
-                texto: "¿Cual de las siguientes magnitudes fisicas es de tipo VECTORIAL (necesita direccion y sentido obligatoriamente)?", 
-                opciones: ["La masa", "El tiempo", "La fuerza", "La temperatura"], 
-                respuestaCorrecta: 2, pista: "Recuerda que no es lo mismo empujar una caja hacia la derecha que hacia la izquierda, pero el tiempo avanza igual hacia un solo lado."
-            },
-            { 
-                texto: "En el Sistema Internacional (SI), el prefijo 'kilo' (k) significa 1000 veces la unidad base. ¿Que prefijo significa la milesima parte (1/1000) o 10⁻³ de la unidad?", 
-                opciones: ["Centi (c)", "Mili (m)", "Micro (µ)", "Mega (M)"], 
-                respuestaCorrecta: 1, pista: "Piensa en como se le llama a la milesima parte de un metro o un litro."
-            },
-            { 
-                texto: "Sabiendo que la aceleracion es la variacion de velocidad sobre el tiempo (a = v/t), ¿cual es su ecuacion dimensional?", 
-                opciones: ["L T⁻¹", "L T⁻²", "M L T⁻²", "L² T⁻¹"], 
-                respuestaCorrecta: 1, pista: "Divide la dimension de velocidad (L T⁻¹) entre la dimension de tiempo (T). Al subir, los exponentes se restan: -1 - 1."
-            },
-            { 
-                texto: "Segun el Principio de Homogeneidad Dimensional, en la ecuacion A = B + C, ¿que se debe cumplir?", 
-                opciones: ["A, B y C deben tener diferentes dimensiones", "La dimension de A es igual a la de B y C por separado", "B y C se multiplican", "La dimension de A es cero"], 
-                respuestaCorrecta: 1, pista: "Solo puedes sumar objetos de la misma especie. Si B es longitud y C es longitud, A tambien debe ser longitud obligatoriamente."
-            },
+            // --- NIVELES 11 AL 14 (Dificultad Avanzada Teórica) ---
+            { texto: "¿Cual de las siguientes magnitudes fisicas es de tipo VECTORIAL (necesita direccion y sentido obligatoriamente)?", opciones: ["La masa", "El tiempo", "La fuerza", "La temperatura"], respuestaCorrecta: 2 },
+            { texto: "En el Sistema Internacional (SI), el prefijo 'kilo' (k) significa 1000 veces la unidad base. ¿Que prefijo significa la milesima parte (1/1000) o 10⁻³ de la unidad?", opciones: ["Centi (c)", "Mili (m)", "Micro (µ)", "Mega (M)"], respuestaCorrecta: 1 },
+            { texto: "Sabiendo que la aceleracion es la variacion de velocidad sobre el tiempo (a = v/t), ¿cual es su ecuacion dimensional?", opciones: ["L T⁻¹", "L T⁻²", "M L T⁻²", "L² T⁻¹"], respuestaCorrecta: 1 },
+            { texto: "Segun el Principio de Homogeneidad Dimensional, en la ecuacion A = B + C, ¿que se debe cumplir?", opciones: ["A, B y C deben tener diferentes dimensiones", "La dimension de A es igual a la de B y C por separado", "B y C se multiplican", "La dimension de A es cero"], respuestaCorrecta: 1 },
 
+            // --- NIVELES 15 AL 20 (CÁLCULOS CON PITÁGORAS Y VECTORES 90°) ---
             { 
-                texto: "Dos vectores tienen una resultante maxima de 25 u (cuando van en el mismo sentido) y una resultante minima de 5 u (cuando van en sentidos opuestos). ¿Cuales son los valores de esos vectores?", 
-                opciones: ["15 u y 10 u", "20 u y 5 u", "12 u y 13 u", "25 u y 5 u"], 
-                respuestaCorrecta: 0, pista: "Busca en las opciones cuales dos numeros sumados te dan 25 (Resultante Maxima) y restados te dan 5 (Resultante Minima)."
+                texto: "Dos vectores tienen modulos de 6 u y 8 u. Si son perpendiculares (forman 90° entre si), ¿cual es el modulo de su resultante?", 
+                opciones: ["14 u", "2 u", "10 u", "48 u"], 
+                respuestaCorrecta: 2, pista: "Aplica el Teorema de Pitagoras: R² = 6² + 8². Suma 36 + 64 y saca la raiz."
+            },
+            { 
+                texto: "Un dron se desplaza 5 km hacia el Este y luego 12 km hacia el Norte. ¿Cual es el modulo de su desplazamiento total?", 
+                opciones: ["17 km", "13 km", "7 km", "60 km"], 
+                respuestaCorrecta: 1, pista: "Forman un triangulo rectangulo. Aplica Pitagoras: R² = 5² + 12² = 25 + 144."
+            },
+            { 
+                texto: "Dos fuerzas perpendiculares de 9 N y 12 N actuan sobre un bloque. ¿Cual es la magnitud de la fuerza resultante?", 
+                opciones: ["21 N", "15 N", "3 N", "108 N"], 
+                respuestaCorrecta: 1, pista: "Aplica Pitagoras: R² = 9² + 12². Es decir, 81 + 144 = 225."
+            },
+            { 
+                texto: "La resultante de dos vectores perpendiculares es 10 u. Si uno de los vectores mide 8 u, ¿cuanto mide el otro vector aplicando Pitagoras?", 
+                opciones: ["2 u", "18 u", "6 u", "4 u"], 
+                respuestaCorrecta: 2, pista: "Conoces la Hipotenusa (10) y un cateto (8). Ecuacion: 10² = 8² + x². Osea 100 = 64 + x²."
+            },
+            { 
+                texto: "Un vehiculo avanza 15 m al Sur y luego 20 m al Oeste (formando 90°). ¿A que distancia recta se encuentra de su punto de inicio?", 
+                opciones: ["35 m", "5 m", "25 m", "300 m"], 
+                respuestaCorrecta: 2, pista: "Usa Pitagoras: R² = 15² + 20². (225 + 400)."
+            },
+            { 
+                texto: "Si tienes dos vectores perpendiculares muy grandes, de 30 u y 40 u, ¿cual es el modulo de su vector resultante?", 
+                opciones: ["70 u", "10 u", "1200 u", "50 u"], 
+                respuestaCorrecta: 3, pista: "Es el clasico triangulo de 3, 4 y 5, pero todo esta multiplicado por 10."
             }
         ];
         
@@ -327,7 +302,7 @@
         let intentosEnPreguntaActual = 0;
         let temporizadorAyuda;
         
-        // === MÉTRICAS GLOBALES PARA LA IA ===
+        // === MÉTRICAS GLOBALES PARA LA IA Y EL REPORTE FINAL ===
         let totalAciertosGlobal = 0;
         let rachaActual = 0;
         let rachaMaxima = 0;
@@ -450,22 +425,21 @@
         // ==========================================
         function evaluarRespuesta(indexSeleccionado, botonElement) {
             intentosEnPreguntaActual++;
-            intentosTotalesGlobal++; // Aumenta total global
+            intentosTotalesGlobal++; 
             
             let tiempoConsumido = (Date.now() - tiempoInicioPregunta) / 1000;
-            tiempoTotalMision += tiempoConsumido; // Aumenta tiempo total
+            tiempoTotalMision += tiempoConsumido; 
             
             const q = preguntas[preguntaActual];
             let esCorrecta = (indexSeleccionado === q.respuestaCorrecta);
             const card = document.getElementById("app-container");
 
-            // EVALUACIÓN DE LA RACHA Y ACIERTOS PARA LA IA
             if (esCorrecta) {
                 totalAciertosGlobal++;
                 rachaActual++;
                 if (rachaActual > rachaMaxima) rachaMaxima = rachaActual; 
             } else {
-                rachaActual = 0; // Se reinicia la racha si falla
+                rachaActual = 0; 
             }
 
             let datosRespuesta = {
@@ -502,7 +476,7 @@
 
         function pedirAyuda() {
             intentosTotalesGlobal++; 
-            rachaActual = 0; // Rompe la racha si pide ayuda
+            rachaActual = 0; 
             let tiempoConsumido = (Date.now() - tiempoInicioPregunta) / 1000; 
             tiempoTotalMision += tiempoConsumido;
             
@@ -524,17 +498,31 @@
             if (preguntaActual < preguntas.length) {
                 cargarPregunta();
             } else {
-                // GUARDADO FINAL DEL RESUMEN PARA EL ÁRBOL DE DECISIÓN
+                let tiempoPromedioFinal = parseFloat((tiempoTotalMision / preguntas.length).toFixed(2));
+
+                // 1. Guardar en Firebase
                 let resumenIA = {
                     total_aciertos: totalAciertosGlobal,
                     racha_maxima: rachaMaxima,
-                    tiempo_promedio_segundos: parseFloat((tiempoTotalMision / preguntas.length).toFixed(2)),
+                    tiempo_promedio_segundos: tiempoPromedioFinal,
                     total_intentos: intentosTotalesGlobal
                 };
-                
                 database.ref('dataset_fisica/' + perfilAlumno.id_sesion + '/resumen_IA').set(resumenIA);
 
-                document.getElementById("encuesta").innerHTML = "<h2 style='color:#00ff88;'>MISION CUMPLIDA</h2><p style='color:#f8fafc; font-size:0.95rem;'>Datos sincronizados con la Base de IA. Excelente trabajo, agente.</p>";
+                // 2. Mostrar Pantalla de Reporte Gamificado
+                document.getElementById("encuesta").innerHTML = `
+                    <h2 style='color:#00ff88; font-size: 1.5rem;'>MISION CUMPLIDA 🚀</h2>
+                    <p style='color:#f8fafc; font-size:0.95rem;'>Tus datos han sido sincronizados con el núcleo de la IA.</p>
+                    
+                    <div class="reporte-caja">
+                        <h3 style='color: #00d2ff; margin-top: 0; text-align: center; border-bottom: 1px solid #1e293b; padding-bottom: 10px;'>REPORTE DE AGENTE</h3>
+                        <p><b>Precisión:</b> ${totalAciertosGlobal} / ${preguntas.length} Aciertos</p>
+                        <p><b>Mejor Racha:</b> ${rachaMaxima} seguidas</p>
+                        <p><b>Velocidad Media:</b> ${tiempoPromedioFinal} seg/nivel</p>
+                        <p><b>Intentos Totales:</b> ${intentosTotalesGlobal}</p>
+                    </div>
+                `;
+                
                 document.getElementById("barraProgreso").style.width = "100%";
                 reproducirSonido("correcto");
                 if (typeof detenerMusicaFondo === "function") detenerMusicaFondo(); 
