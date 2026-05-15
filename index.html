@@ -292,11 +292,12 @@
         let intentosEnPreguntaActual = 0;
         let temporizadorAyuda;
         
+    
+        // ==========================================
+        // 4. CONTROLADOR DE LA MISIÓN Y BASE DE DATOS
+        // ==========================================
         let perfilAlumno = { edad: "", grado: "5", seccion: "", id_sesion: "" };
 
-        // ==========================================
-        // 4. CONTROLADOR DE LA MISIÓN
-        // ==========================================
         function iniciarEncuesta() {
             perfilAlumno.edad = document.getElementById("edadAlumno").value.trim();
             perfilAlumno.seccion = document.getElementById("seccionAlumno").value.trim().toUpperCase();
@@ -306,14 +307,39 @@
                 return;
             }
 
-            perfilAlumno.id_sesion = "AGENTE-" + Math.floor(Math.random() * 100000);
-            
-            iniciarMusicaFondo(); 
-            
-            document.getElementById("inicio").style.display = "none";
-            document.getElementById("encuesta").style.display = "block";
-            
-            cargarPregunta();
+            // ============================================================
+            // SIMULACIÓN DE AUTO_INCREMENT (SQL) CON TRANSACCIONES NO-SQL
+            // ============================================================
+            let contadorRef = database.ref('metadata/total_estudiantes');
+
+            // La transacción lee el valor actual en la nube y le suma 1 de forma segura
+            contadorRef.transaction(function(valorActual) {
+                return (valorActual || 0) + 1;
+            }, function(error, guardado, snapshot) {
+                if (error) {
+                    console.error("Error de sincronización.", error);
+                    // Respaldo de emergencia si falla el internet
+                    perfilAlumno.id_sesion = "ESTUDIANTE_R" + Math.floor(Math.random() * 1000);
+                } else if (guardado) {
+                    let numeroSecuencial = snapshot.val(); // Extrae el 1, 2, 3...
+                    perfilAlumno.id_sesion = "ESTUDIANTE_" + numeroSecuencial;
+                }
+
+                // GUARDAR EL PERFIL CON EL NUEVO ID SECUENCIAL
+                database.ref('dataset_fisica/' + perfilAlumno.id_sesion + '/perfil').set({
+                    edad: perfilAlumno.edad,
+                    grado: perfilAlumno.grado,
+                    seccion: perfilAlumno.seccion,
+                    inicio_timestamp: firebase.database.ServerValue.TIMESTAMP
+                });
+
+                // Iniciar la interfaz solo después de obtener el número de estudiante
+                iniciarMusicaFondo(); 
+                document.getElementById("inicio").style.display = "none";
+                document.getElementById("encuesta").style.display = "block";
+                
+                cargarPregunta();
+            });
         }
 
         function cargarPregunta() {
@@ -386,8 +412,8 @@
             avanzarSiguiente();
         }
 
-        // ==========================================
-        // EVALUACIÓN Y ENVÍO A FIREBASE
+       // ==========================================
+        // EVALUACIÓN Y ENVÍO A FIREBASE (DATOS LIMPIOS)
         // ==========================================
         function evaluarRespuesta(indexSeleccionado, botonElement) {
             intentosEnPreguntaActual++;
@@ -396,19 +422,17 @@
             let esCorrecta = (indexSeleccionado === q.respuestaCorrecta);
             const card = document.getElementById("app-container");
 
-            let datos = {
-                id_sesion: perfilAlumno.id_sesion,
-                edad: perfilAlumno.edad,
-                grado: perfilAlumno.grado, 
-                seccion: perfilAlumno.seccion,
-                pregunta_nro: preguntaActual + 1,
+            // ESTRUCTURA LIMPIA PARA LA PREGUNTA ACTUAL
+            let datosRespuesta = {
                 acierto: esCorrecta,
                 tiempo_segundos: parseFloat(tiempoConsumido.toFixed(2)),
                 intentos: intentosEnPreguntaActual,
-                pidio_ayuda: false,
-                timestamp: firebase.database.ServerValue.TIMESTAMP
+                pidio_ayuda: false
             };
-            database.ref('dataset_fisica/' + perfilAlumno.id_sesion).push(datos);
+
+            // Usamos .set() en lugar de .push() para anidar la pregunta dentro del estudiante
+            let rutaPregunta = 'dataset_fisica/' + perfilAlumno.id_sesion + '/respuestas/Pregunta_' + (preguntaActual + 1);
+            database.ref(rutaPregunta).set(datosRespuesta);
 
             if (esCorrecta) {
                 reproducirSonido("correcto");
@@ -434,19 +458,16 @@
 
         function pedirAyuda() {
             let tiempoConsumido = (Date.now() - tiempoInicioPregunta) / 1000; 
-            let datos = {
-                id_sesion: perfilAlumno.id_sesion,
-                edad: perfilAlumno.edad,
-                grado: perfilAlumno.grado, 
-                seccion: perfilAlumno.seccion,
-                pregunta_nro: preguntaActual + 1,
+            
+            let datosRespuesta = {
                 acierto: false,
                 tiempo_segundos: parseFloat(tiempoConsumido.toFixed(2)),
                 intentos: intentosEnPreguntaActual,
-                pidio_ayuda: true,
-                timestamp: firebase.database.ServerValue.TIMESTAMP
+                pidio_ayuda: true
             };
-            database.ref('dataset_fisica/' + perfilAlumno.id_sesion).push(datos);
+
+            let rutaPregunta = 'dataset_fisica/' + perfilAlumno.id_sesion + '/respuestas/Pregunta_' + (preguntaActual + 1);
+            database.ref(rutaPregunta).set(datosRespuesta);
             
             abrirModal('Refuerzo');
         }
