@@ -10,55 +10,56 @@
         /* ================= ESTÉTICA FUTURISTA (SCI-FI) ================= */
         body { 
             font-family: 'Poppins', sans-serif; 
-            margin: 0; padding: 20px; 
+            margin: 0; padding: 15px; /* Reducido para dar más espacio a la tarjeta */
             display: flex; justify-content: center; align-items: center; min-height: 100vh;
             background-color: #0b0f19;
             background-image: 
                 radial-gradient(circle at 15% 50%, rgba(0, 210, 255, 0.08), transparent 25%),
                 radial-gradient(circle at 85% 30%, rgba(0, 255, 136, 0.08), transparent 25%);
             color: #e2e8f0;
-            overflow: hidden;
+            overflow-x: hidden; /* Previene scroll horizontal accidental */
         }
 
         .card { 
             background: rgba(15, 23, 42, 0.7); 
-            padding: 30px 20px; 
-            border-radius: 20px; 
+            padding: 25px 15px; /* Padding interno reducido */
+            border-radius: 16px; 
             border: 1px solid rgba(0, 210, 255, 0.3);
             box-shadow: 0 0 30px rgba(0, 210, 255, 0.15), inset 0 0 20px rgba(0, 210, 255, 0.05);
             width: 100%; max-width: 420px; 
             text-align: center;
             backdrop-filter: blur(12px);
             transition: all 0.3s ease;
+            box-sizing: border-box; /* Asegura que el padding no desborde el ancho */
         }
 
-        .progress-bar { width: 100%; background-color: #1e293b; border-radius: 10px; height: 8px; margin-bottom: 25px; box-shadow: inset 0 0 5px #000;}
-        .progress { background: linear-gradient(90deg, #00d2ff, #00ff88); height: 8px; border-radius: 10px; width: 0%; box-shadow: 0 0 10px #00ff88; transition: width 0.5s ease; }
+        .progress-bar { width: 100%; background-color: #1e293b; border-radius: 10px; height: 6px; margin-bottom: 20px; box-shadow: inset 0 0 5px #000;}
+        .progress { background: linear-gradient(90deg, #00d2ff, #00ff88); height: 6px; border-radius: 10px; width: 0%; box-shadow: 0 0 10px #00ff88; transition: width 0.5s ease; }
         
-        h2 { font-family: 'Orbitron', sans-serif; font-size: 1.4rem; color: #00d2ff; text-shadow: 0 0 10px rgba(0, 210, 255, 0.5); margin-top: 0;}
-        p.enunciado { font-size: 1.05rem; margin-bottom: 20px; font-weight: 400; color:#f8fafc; line-height: 1.5;}
+        h2 { font-family: 'Orbitron', sans-serif; font-size: 1.2rem; color: #00d2ff; text-shadow: 0 0 10px rgba(0, 210, 255, 0.5); margin-top: 0; margin-bottom: 10px;}
+        p.enunciado { font-size: 0.95rem; margin-bottom: 15px; font-weight: 400; color:#f8fafc; line-height: 1.4;}
         
         /* Inputs Futuristas */
         input {
-            width: 90%; padding: 14px; margin-bottom: 12px; border-radius: 10px; 
+            width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; 
             background: rgba(15, 23, 42, 0.8); border: 1px solid #1e293b;
             color: #00d2ff; font-family: 'Orbitron', sans-serif; outline: none;
-            text-align: center; font-size: 0.95rem;
+            text-align: center; font-size: 0.9rem; box-sizing: border-box;
         }
         input:focus { border-color: #00ff88; box-shadow: 0 0 15px rgba(0, 255, 136, 0.3); }
         input::placeholder { color: #475569; }
 
-        .input-group { display: flex; gap: 10px; width: 98%; margin: 0 auto; justify-content: center;}
-        .input-group input { width: 45%; }
+        .input-group { display: flex; gap: 8px; width: 100%; justify-content: space-between;}
+        .input-group input { width: 48%; }
 
         /* Botones Neón */
         .btn { 
-            width: 100%; padding: 16px; margin: 8px 0; 
+            width: 100%; padding: 12px; margin: 6px 0; /* Botones más delgados */
             border: 1px solid rgba(0, 210, 255, 0.4); 
-            border-radius: 12px; background-color: rgba(0, 210, 255, 0.05); 
-            font-size: 1rem; font-weight: 600; color: #00d2ff; 
+            border-radius: 10px; background-color: rgba(0, 210, 255, 0.05); 
+            font-size: 0.9rem; font-weight: 600; color: #00d2ff; 
             cursor: pointer; transition: all 0.2s ease; 
-            text-transform: uppercase; letter-spacing: 1px;
+            text-transform: uppercase; letter-spacing: 0.5px;
         }
         .btn:hover, .btn:active { 
             background-color: rgba(0, 210, 255, 0.2); 
@@ -70,13 +71,13 @@
         .btn-comenzar:hover { background: linear-gradient(45deg, #00ff88, #00d2ff); box-shadow: 0 0 25px rgba(0, 255, 136, 0.6);}
 
         /* Pistas y Ayudas */
-        .btn-pista { border-color: #f59e0b; color: #f59e0b; background: rgba(245, 158, 11, 0.1); margin-top: 15px; display: none; }
-        .btn-ayuda { border-color: #ef4444; color: #ef4444; background: rgba(239, 68, 68, 0.1); margin-top: 10px; display: none; }
+        .btn-pista { border-color: #f59e0b; color: #f59e0b; background: rgba(245, 158, 11, 0.1); margin-top: 10px; display: none; font-size: 0.85rem; padding: 10px;}
+        .btn-ayuda { border-color: #ef4444; color: #ef4444; background: rgba(239, 68, 68, 0.1); margin-top: 10px; display: none; font-size: 0.85rem; padding: 10px;}
         
         .caja-pista {
-            background: rgba(245, 158, 11, 0.1); border-left: 4px solid #f59e0b; padding: 12px;
-            font-size: 0.9rem; margin-top: 10px; border-radius: 4px; display: none; text-align: left;
-            color: #fcd34d; text-shadow: 0 0 5px rgba(245, 158, 11, 0.3);
+            background: rgba(245, 158, 11, 0.1); border-left: 4px solid #f59e0b; padding: 10px;
+            font-size: 0.85rem; margin-top: 8px; border-radius: 4px; display: none; text-align: left;
+            color: #fcd34d; text-shadow: 0 0 5px rgba(245, 158, 11, 0.3); line-height: 1.3;
         }
 
         /* ================= MODALES GAMIFICADOS ================= */
@@ -87,23 +88,34 @@
             opacity: 0; transition: opacity 0.3s ease;
         }
         .modal-box {
-            background: #0f172a; padding: 30px; border-radius: 20px;
-            text-align: center; max-width: 300px;
+            background: #0f172a; padding: 25px 20px; border-radius: 16px;
+            text-align: center; width: 90%; max-width: 300px;
             transform: scale(0.8); transition: transform 0.3s ease;
         }
         .modal-error { border: 2px solid #ef4444; box-shadow: 0 0 30px rgba(239, 68, 68, 0.4); }
         .modal-refuerzo { border: 2px solid #3b82f6; box-shadow: 0 0 30px rgba(59, 130, 246, 0.4); }
         
-        .modal-box h3 { font-family: 'Orbitron', sans-serif; margin-top: 0; }
+        .modal-box h3 { font-family: 'Orbitron', sans-serif; margin-top: 0; font-size: 1.1rem;}
         .modal-error h3 { color: #ef4444; text-shadow: 0 0 10px rgba(239,68,68,0.5); }
         .modal-refuerzo h3 { color: #3b82f6; text-shadow: 0 0 10px rgba(59,130,246,0.5); }
         
-        .modal-box p { color: #e2e8f0; font-size: 0.95rem; margin-bottom: 20px;}
-        .btn-modal-error { background: #ef4444; color: white; border: none; box-shadow: 0 0 15px rgba(239,68,68,0.5); }
-        .btn-modal-refuerzo { background: #3b82f6; color: white; border: none; box-shadow: 0 0 15px rgba(59,130,246,0.5); }
+        .modal-box p { color: #e2e8f0; font-size: 0.9rem; margin-bottom: 20px; line-height: 1.4;}
+        .btn-modal-error { background: #ef4444; color: white; border: none; box-shadow: 0 0 15px rgba(239,68,68,0.5); padding: 12px;}
+        .btn-modal-refuerzo { background: #3b82f6; color: white; border: none; box-shadow: 0 0 15px rgba(59,130,246,0.5); padding: 12px;}
 
         .shake { animation: shake 0.4s; }
         @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
+
+        /* REGLAS ESPECÍFICAS PARA PANTALLAS MUY PEQUEÑAS (iPhone SE, Androids compactos) */
+        @media (max-width: 380px) {
+            body { padding: 10px; }
+            .card { padding: 20px 10px; }
+            h2 { font-size: 1.1rem; }
+            p.enunciado { font-size: 0.9rem; }
+            .btn { font-size: 0.85rem; padding: 10px; }
+            .input-group { flex-direction: column; gap: 0; }
+            .input-group input { width: 100%; margin-bottom: 10px; }
+        }
     </style>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -130,7 +142,7 @@
     <div class="card" id="app-container">
         <div id="inicio">
             <h2>SISTEMA IA: ACTIVADO</h2>
-            <p style="color:#94a3b8; font-size:0.9rem;">Calibrando simulacion de fisica (Nivel: 5to Año)...</p>
+            <p style="color:#94a3b8; font-size:0.85rem;">Calibrando simulacion de fisica (Nivel: 5to Año)...</p>
             
             <div class="input-group">
                 <input type="number" id="edadAlumno" placeholder="EDAD (Ej: 16)" min="10" max="20">
@@ -155,7 +167,7 @@
     </div>
 
     <script>
-        // ==========================================
+       // ==========================================
         // 1. SISTEMA DE AUDIO (MP3 EXTERNO + EFECTOS SINTÉTICOS)
         // ==========================================
         const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -203,6 +215,7 @@
                 osc.start(); osc.stop(audioCtx.currentTime + 0.3);
             }
         }
+
         // ==========================================
         // 2. CONFIGURACIÓN DE FIREBASE
         // ==========================================
@@ -279,7 +292,6 @@
         let intentosEnPreguntaActual = 0;
         let temporizadorAyuda;
         
-        // El grado está fijado en 5 y se genera un ID anónimo para agrupar los datos
         let perfilAlumno = { edad: "", grado: "5", seccion: "", id_sesion: "" };
 
         // ==========================================
@@ -294,7 +306,6 @@
                 return;
             }
 
-            // Generar ID anónimo único (Ej: AGENTE-48291)
             perfilAlumno.id_sesion = "AGENTE-" + Math.floor(Math.random() * 100000);
             
             iniciarMusicaFondo(); 
@@ -388,7 +399,7 @@
             let datos = {
                 id_sesion: perfilAlumno.id_sesion,
                 edad: perfilAlumno.edad,
-                grado: perfilAlumno.grado, // Siempre será "5"
+                grado: perfilAlumno.grado, 
                 seccion: perfilAlumno.seccion,
                 pregunta_nro: preguntaActual + 1,
                 acierto: esCorrecta,
@@ -397,7 +408,6 @@
                 pidio_ayuda: false,
                 timestamp: firebase.database.ServerValue.TIMESTAMP
             };
-            // Usamos el id_sesion para agrupar las respuestas de este alumno anónimo en Firebase
             database.ref('dataset_fisica/' + perfilAlumno.id_sesion).push(datos);
 
             if (esCorrecta) {
@@ -423,12 +433,11 @@
         }
 
         function pedirAyuda() {
-            // Corregido: se divide entre 1000 para obtener segundos reales
             let tiempoConsumido = (Date.now() - tiempoInicioPregunta) / 1000; 
             let datos = {
                 id_sesion: perfilAlumno.id_sesion,
                 edad: perfilAlumno.edad,
-                grado: perfilAlumno.grado, // Siempre será "5"
+                grado: perfilAlumno.grado, 
                 seccion: perfilAlumno.seccion,
                 pregunta_nro: preguntaActual + 1,
                 acierto: false,
@@ -447,7 +456,7 @@
             if (preguntaActual < preguntas.length) {
                 cargarPregunta();
             } else {
-                document.getElementById("encuesta").innerHTML = "<h2 style='color:#00ff88;'>MISION CUMPLIDA</h2><p style='color:#f8fafc;'>Datos sincronizados con la Base de IA. Excelente trabajo, agente.</p>";
+                document.getElementById("encuesta").innerHTML = "<h2 style='color:#00ff88;'>MISION CUMPLIDA</h2><p style='color:#f8fafc; font-size:0.95rem;'>Datos sincronizados con la Base de IA. Excelente trabajo, agente.</p>";
                 document.getElementById("barraProgreso").style.width = "100%";
                 reproducirSonido("correcto");
                 if(ambientOsc) ambientOsc.stop(); 
