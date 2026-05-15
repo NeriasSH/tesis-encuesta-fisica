@@ -114,7 +114,7 @@
     <div id="modalError" class="modal-overlay">
         <div class="modal-box modal-error" id="modalCajaError">
             <h3>ALERTA DE SISTEMA</h3>
-            <p>Esa no es la respuesta correcta. Reagrupa tus datos, revisa la teoría y sigue intentándolo.</p>
+            <p>Esa no es la respuesta correcta. Reagrupa tus datos, revisa la teoria y sigue intentandolo.</p>
             <button class="btn btn-modal-error" onclick="cerrarModal('Error')">Volver a la mision</button>
         </div>
     </div>
@@ -122,7 +122,7 @@
     <div id="modalRefuerzo" class="modal-overlay">
         <div class="modal-box modal-refuerzo" id="modalCajaRefuerzo">
             <h3>SOLICITUD RECIBIDA</h3>
-            <p>El sistema ha registrado que necesitas refuerzo en este tema. La IA adaptará tu entrenamiento futuro.</p>
+            <p>El sistema ha registrado que necesitas refuerzo en este tema. La IA adaptara tu entrenamiento futuro.</p>
             <button class="btn btn-modal-refuerzo" onclick="cerrarModalYAvanzar()">Continuar mision</button>
         </div>
     </div>
@@ -130,15 +130,12 @@
     <div class="card" id="app-container">
         <div id="inicio">
             <h2>SISTEMA IA: ACTIVADO</h2>
-            <p style="color:#94a3b8; font-size:0.9rem;">Calibrando simulacion de fisica...</p>
-            
-            <input type="text" id="codigoAlumno" placeholder="CODIGO AGENTE (Ej: ALUM-01)">
+            <p style="color:#94a3b8; font-size:0.9rem;">Calibrando simulacion de fisica (Nivel: 5to Año)...</p>
             
             <div class="input-group">
-                <input type="number" id="edadAlumno" placeholder="EDAD" min="10" max="20">
-                <input type="number" id="gradoAlumno" placeholder="GRADO (Ej: 5)">
+                <input type="number" id="edadAlumno" placeholder="EDAD (Ej: 16)" min="10" max="20">
+                <input type="text" id="seccionAlumno" placeholder="SECCION (Ej: A)" maxlength="1">
             </div>
-            <input type="text" id="seccionAlumno" placeholder="SECCION (Ej: A o B)" maxlength="2" style="width:95%;">
             
             <button class="btn btn-comenzar" onclick="iniciarEncuesta()">INICIAR MISION</button>
         </div>
@@ -159,32 +156,33 @@
 
     <script>
         // ==========================================
-        // 1. SISTEMA DE AUDIO (MÚSICA CONTINUA)
+        // 1. SISTEMA DE AUDIO (MP3 EXTERNO + EFECTOS SINTÉTICOS)
         // ==========================================
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         let audioCtx;
-        let ambientOsc;
+
+        // Instanciamos el audio. Asegúrate de que el nombre coincida con tu archivo
+        const pistaFondo = new Audio('musica-mision.mp3'); 
+        pistaFondo.loop = true; // Activa el bucle infinito
+        pistaFondo.volume = 0.15; // Volumen al 15% para no desconcentrar la lectura
 
         function iniciarMusicaFondo() {
-            if (!audioCtx) audioCtx = new AudioContext();
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            
-            // Sonido de fondo continuo tipo "nave espacial"
-            ambientOsc = audioCtx.createOscillator();
-            const gainNode = audioCtx.createGain();
-            
-            ambientOsc.type = 'sine';
-            ambientOsc.frequency.value = 65.41; // Nota muy grave y sostenida
-            
-            gainNode.gain.value = 0.05; // Volumen bajo
-            
-            ambientOsc.connect(gainNode);
-            gainNode.connect(audioCtx.destination);
-            ambientOsc.start();
+            // El catch evita errores en consola si el navegador demora en cargar el archivo
+            pistaFondo.play().catch(error => {
+                console.log("Audio en espera de carga o interacción: ", error);
+            });
+        }
+
+        function detenerMusicaFondo() {
+            pistaFondo.pause();
+            pistaFondo.currentTime = 0; // Reinicia la pista a cero
         }
 
         function reproducirSonido(tipo) {
-            if (!audioCtx) return;
+            // Mantenemos la generación sintética para los efectos de la interfaz
+            if (!audioCtx) audioCtx = new AudioContext();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.connect(gain);
@@ -205,7 +203,6 @@
                 osc.start(); osc.stop(audioCtx.currentTime + 0.3);
             }
         }
-
         // ==========================================
         // 2. CONFIGURACIÓN DE FIREBASE
         // ==========================================
@@ -222,7 +219,7 @@
         const database = firebase.database();
 
         // ==========================================
-        // 3. BASE DE DATOS DE PREGUNTAS (Con nuevas pistas)
+        // 3. BASE DE DATOS DE PREGUNTAS
         // ==========================================
         const preguntas = [
             { 
@@ -233,7 +230,7 @@
             { 
                 texto: "En mediciones, ¿cual es la diferencia entre Exactitud y Precision?", 
                 opciones: ["Son sinonimos", "Exactitud es acertar al centro real; Precision es que tus medidas sean iguales entre si", "Precision es el valor real", "Solo aplica a vectores"], 
-                respuestaCorrecta: 1, pista: "Imagina un blanco de dardos: Exactitud es dar en el rojo. Precision es que todos tus dardos caigan juntos (aunque sea fuera del rojo)."
+                respuestaCorrecta: 1
             },
             { 
                 texto: "Segun el Sistema Internacional (SI), ¿que magnitud fisica fundamental se mide en kilogramos?", 
@@ -243,7 +240,7 @@
             { 
                 texto: "¿Cual de las siguientes es una magnitud derivada?", 
                 opciones: ["El tiempo", "La temperatura", "La longitud", "La velocidad"], 
-                respuestaCorrecta: 3, pista: "AYUDA DE TEORIA: Las magnitudes fundamentales son 7 (Masa, Longitud, Tiempo, Temperatura, etc.). Las derivadas nacen al combinar estas fundamentales. Por ejemplo, la velocidad combina longitud y tiempo."
+                respuestaCorrecta: 3, pista: "AYUDA DE TEORIA: Las magnitudes fundamentales son 7. Las derivadas nacen al combinar estas fundamentales. Por ejemplo, la velocidad combina longitud y tiempo."
             },
             { 
                 texto: "En el analisis dimensional, ¿cual es la ecuacion dimensional correcta para el AREA?", 
@@ -253,7 +250,7 @@
             { 
                 texto: "La ecuacion dimensional de la VELOCIDAD se expresa como:", 
                 opciones: ["L T⁻¹", "L T⁻²", "M L T", "L²"], 
-                respuestaCorrecta: 0, pista: "AYUDA DE DIMENSIONES: Velocidad = Distancia / Tiempo. Distancia es Longitud (L) y Tiempo es (T). En analisis dimensional, al subir la (T) del denominador, su exponente cambia de signo."
+                respuestaCorrecta: 0, pista: "AYUDA DE DIMENSIONES: Velocidad = Distancia / Tiempo. Distancia es Longitud (L) y Tiempo es (T). Al subir la (T) del denominador, su exponente cambia de signo."
             },
             { 
                 texto: "Al graficar un vector, ¿que elemento nos indica especificamente hacia donde apunta (la cabeza de la flecha)?", 
@@ -282,21 +279,23 @@
         let intentosEnPreguntaActual = 0;
         let temporizadorAyuda;
         
-        let perfilAlumno = { codigo: "", edad: "", grado: "", seccion: "" };
+        // El grado está fijado en 5 y se genera un ID anónimo para agrupar los datos
+        let perfilAlumno = { edad: "", grado: "5", seccion: "", id_sesion: "" };
 
         // ==========================================
         // 4. CONTROLADOR DE LA MISIÓN
         // ==========================================
         function iniciarEncuesta() {
-            perfilAlumno.codigo = document.getElementById("codigoAlumno").value.trim();
             perfilAlumno.edad = document.getElementById("edadAlumno").value.trim();
-            perfilAlumno.grado = document.getElementById("gradoAlumno").value.trim();
             perfilAlumno.seccion = document.getElementById("seccionAlumno").value.trim().toUpperCase();
             
-            if(!perfilAlumno.codigo || !perfilAlumno.edad || !perfilAlumno.grado || !perfilAlumno.seccion) {
-                abrirModal('Error', "FALTAN DATOS", "Agente, debe ingresar codigo, edad, grado y seccion para continuar.");
+            if(!perfilAlumno.edad || !perfilAlumno.seccion) {
+                abrirModal('Error', "FALTAN DATOS", "Agente, debe ingresar su edad y seccion para continuar.");
                 return;
             }
+
+            // Generar ID anónimo único (Ej: AGENTE-48291)
+            perfilAlumno.id_sesion = "AGENTE-" + Math.floor(Math.random() * 100000);
             
             iniciarMusicaFondo(); 
             
@@ -387,9 +386,9 @@
             const card = document.getElementById("app-container");
 
             let datos = {
-                alumno: perfilAlumno.codigo,
+                id_sesion: perfilAlumno.id_sesion,
                 edad: perfilAlumno.edad,
-                grado: perfilAlumno.grado,
+                grado: perfilAlumno.grado, // Siempre será "5"
                 seccion: perfilAlumno.seccion,
                 pregunta_nro: preguntaActual + 1,
                 acierto: esCorrecta,
@@ -398,7 +397,8 @@
                 pidio_ayuda: false,
                 timestamp: firebase.database.ServerValue.TIMESTAMP
             };
-            database.ref('dataset_fisica/' + perfilAlumno.codigo).push(datos);
+            // Usamos el id_sesion para agrupar las respuestas de este alumno anónimo en Firebase
+            database.ref('dataset_fisica/' + perfilAlumno.id_sesion).push(datos);
 
             if (esCorrecta) {
                 reproducirSonido("correcto");
@@ -423,11 +423,12 @@
         }
 
         function pedirAyuda() {
-            let tiempoConsumido = (Date.now() - tiempoInicioPregunta) / 1000;
+            // Corregido: se divide entre 1000 para obtener segundos reales
+            let tiempoConsumido = (Date.now() - tiempoInicioPregunta) / 1000; 
             let datos = {
-                alumno: perfilAlumno.codigo,
+                id_sesion: perfilAlumno.id_sesion,
                 edad: perfilAlumno.edad,
-                grado: perfilAlumno.grado,
+                grado: perfilAlumno.grado, // Siempre será "5"
                 seccion: perfilAlumno.seccion,
                 pregunta_nro: preguntaActual + 1,
                 acierto: false,
@@ -436,9 +437,8 @@
                 pidio_ayuda: true,
                 timestamp: firebase.database.ServerValue.TIMESTAMP
             };
-            database.ref('dataset_fisica/' + perfilAlumno.codigo).push(datos);
+            database.ref('dataset_fisica/' + perfilAlumno.id_sesion).push(datos);
             
-            // Abre el modal de refuerzo (el cual llama a avanzarSiguiente al darle clic)
             abrirModal('Refuerzo');
         }
 
