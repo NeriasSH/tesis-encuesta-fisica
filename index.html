@@ -3,176 +3,443 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Desafío de Física | IA</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <title>Simulador de Física | IA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     
     <style>
-        /* Diseño Mobile-First y Atractivo */
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #f0f4f8; /* Fondo suave */
-            color: #333;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+        /* ================= ESTÉTICA FUTURISTA (SCI-FI) ================= */
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            margin: 0; padding: 20px; 
+            display: flex; justify-content: center; align-items: center; min-height: 100vh;
+            background-color: #0b0f19;
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(0, 210, 255, 0.08), transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(0, 255, 136, 0.08), transparent 25%);
+            color: #e2e8f0;
+            overflow: hidden;
         }
-        .card {
-            background: white;
-            padding: 30px 20px;
-            border-radius: 16px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            width: 100%;
-            max-width: 400px;
+
+        .card { 
+            background: rgba(15, 23, 42, 0.7); 
+            padding: 30px 20px; 
+            border-radius: 20px; 
+            border: 1px solid rgba(0, 210, 255, 0.3);
+            box-shadow: 0 0 30px rgba(0, 210, 255, 0.15), inset 0 0 20px rgba(0, 210, 255, 0.05);
+            width: 100%; max-width: 420px; 
             text-align: center;
+            backdrop-filter: blur(12px);
+            transition: all 0.3s ease;
         }
-        .progress-bar {
-            width: 100%;
-            background-color: #e0e0e0;
-            border-radius: 8px;
-            height: 10px;
-            margin-bottom: 20px;
-        }
-        .progress {
-            background-color: #4CAF50;
-            height: 10px;
-            border-radius: 8px;
-            width: 10%; /* Cambiará dinámicamente */
-            transition: width 0.3s ease;
-        }
-        h2 { font-size: 1.2rem; color: #2c3e50; }
-        p.enunciado { font-size: 1rem; margin-bottom: 25px; font-weight: 600;}
+
+        .progress-bar { width: 100%; background-color: #1e293b; border-radius: 10px; height: 8px; margin-bottom: 25px; box-shadow: inset 0 0 5px #000;}
+        .progress { background: linear-gradient(90deg, #00d2ff, #00ff88); height: 8px; border-radius: 10px; width: 0%; box-shadow: 0 0 10px #00ff88; transition: width 0.5s ease; }
         
-        /* Zonas Táctiles Grandes */
-        .btn {
-            width: 100%;
-            padding: 15px;
-            margin: 8px 0;
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            background-color: white;
-            font-size: 1rem;
-            font-weight: 600;
-            color: #4a5568;
-            cursor: pointer;
-            transition: all 0.2s ease;
+        h2 { font-family: 'Orbitron', sans-serif; font-size: 1.4rem; color: #00d2ff; text-shadow: 0 0 10px rgba(0, 210, 255, 0.5); margin-top: 0;}
+        p.enunciado { font-size: 1.05rem; margin-bottom: 20px; font-weight: 400; color:#f8fafc; line-height: 1.5;}
+        
+        /* Inputs Futuristas */
+        input {
+            width: 90%; padding: 14px; margin-bottom: 12px; border-radius: 10px; 
+            background: rgba(15, 23, 42, 0.8); border: 1px solid #1e293b;
+            color: #00d2ff; font-family: 'Orbitron', sans-serif; outline: none;
+            text-align: center; font-size: 0.95rem;
         }
-        .btn:hover, .btn:active {
-            border-color: #3182ce;
-            background-color: #ebf8ff;
-            color: #3182ce;
+        input:focus { border-color: #00ff88; box-shadow: 0 0 15px rgba(0, 255, 136, 0.3); }
+        input::placeholder { color: #475569; }
+
+        .input-group { display: flex; gap: 10px; width: 98%; margin: 0 auto; justify-content: center;}
+        .input-group input { width: 45%; }
+
+        /* Botones Neón */
+        .btn { 
+            width: 100%; padding: 16px; margin: 8px 0; 
+            border: 1px solid rgba(0, 210, 255, 0.4); 
+            border-radius: 12px; background-color: rgba(0, 210, 255, 0.05); 
+            font-size: 1rem; font-weight: 600; color: #00d2ff; 
+            cursor: pointer; transition: all 0.2s ease; 
+            text-transform: uppercase; letter-spacing: 1px;
         }
-        .btn-ayuda {
-            background-color: #fff5f5;
-            border-color: #feb2b2;
-            color: #c53030;
-            margin-top: 20px;
-            display: none; /* Oculto inicialmente */
+        .btn:hover, .btn:active { 
+            background-color: rgba(0, 210, 255, 0.2); 
+            box-shadow: 0 0 15px rgba(0, 210, 255, 0.4); 
+            transform: scale(0.98);
         }
-        .btn-ayuda:hover { background-color: #fed7d7; }
+        
+        .btn-comenzar { background: linear-gradient(45deg, #00d2ff, #0055ff); color: white; border: none; box-shadow: 0 0 20px rgba(0, 210, 255, 0.6); margin-top: 15px;}
+        .btn-comenzar:hover { background: linear-gradient(45deg, #00ff88, #00d2ff); box-shadow: 0 0 25px rgba(0, 255, 136, 0.6);}
+
+        /* Pistas y Ayudas */
+        .btn-pista { border-color: #f59e0b; color: #f59e0b; background: rgba(245, 158, 11, 0.1); margin-top: 15px; display: none; }
+        .btn-ayuda { border-color: #ef4444; color: #ef4444; background: rgba(239, 68, 68, 0.1); margin-top: 10px; display: none; }
+        
+        .caja-pista {
+            background: rgba(245, 158, 11, 0.1); border-left: 4px solid #f59e0b; padding: 12px;
+            font-size: 0.9rem; margin-top: 10px; border-radius: 4px; display: none; text-align: left;
+            color: #fcd34d; text-shadow: 0 0 5px rgba(245, 158, 11, 0.3);
+        }
+
+        /* ================= MODALES GAMIFICADOS ================= */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(5px);
+            display: none; justify-content: center; align-items: center; z-index: 1000;
+            opacity: 0; transition: opacity 0.3s ease;
+        }
+        .modal-box {
+            background: #0f172a; padding: 30px; border-radius: 20px;
+            text-align: center; max-width: 300px;
+            transform: scale(0.8); transition: transform 0.3s ease;
+        }
+        .modal-error { border: 2px solid #ef4444; box-shadow: 0 0 30px rgba(239, 68, 68, 0.4); }
+        .modal-refuerzo { border: 2px solid #3b82f6; box-shadow: 0 0 30px rgba(59, 130, 246, 0.4); }
+        
+        .modal-box h3 { font-family: 'Orbitron', sans-serif; margin-top: 0; }
+        .modal-error h3 { color: #ef4444; text-shadow: 0 0 10px rgba(239,68,68,0.5); }
+        .modal-refuerzo h3 { color: #3b82f6; text-shadow: 0 0 10px rgba(59,130,246,0.5); }
+        
+        .modal-box p { color: #e2e8f0; font-size: 0.95rem; margin-bottom: 20px;}
+        .btn-modal-error { background: #ef4444; color: white; border: none; box-shadow: 0 0 15px rgba(239,68,68,0.5); }
+        .btn-modal-refuerzo { background: #3b82f6; color: white; border: none; box-shadow: 0 0 15px rgba(59,130,246,0.5); }
+
+        .shake { animation: shake 0.4s; }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
     </style>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
 <body>
 
+    <div id="modalError" class="modal-overlay">
+        <div class="modal-box modal-error" id="modalCajaError">
+            <h3>ALERTA DE SISTEMA</h3>
+            <p>Esa no es la respuesta correcta. Reagrupa tus datos, revisa la teoría y sigue intentándolo.</p>
+            <button class="btn btn-modal-error" onclick="cerrarModal('Error')">Volver a la mision</button>
+        </div>
+    </div>
+
+    <div id="modalRefuerzo" class="modal-overlay">
+        <div class="modal-box modal-refuerzo" id="modalCajaRefuerzo">
+            <h3>SOLICITUD RECIBIDA</h3>
+            <p>El sistema ha registrado que necesitas refuerzo en este tema. La IA adaptará tu entrenamiento futuro.</p>
+            <button class="btn btn-modal-refuerzo" onclick="cerrarModalYAvanzar()">Continuar mision</button>
+        </div>
+    </div>
+
     <div class="card" id="app-container">
         <div id="inicio">
-            <h2>¡Bienvenido al Desafío!</h2>
-            <p>Resuelve estos 10 ejercicios de física. Tómate tu tiempo, pero concéntrate.</p>
-            <input type="text" id="codigoAlumno" placeholder="Ingresa tu código escolar" style="width: 90%; padding: 12px; margin-bottom: 15px; border-radius: 8px; border: 1px solid #ccc;">
-            <button class="btn" style="background-color: #3182ce; color: white; border: none;" onclick="iniciarEncuesta()">Comenzar</button>
+            <h2>SISTEMA IA: ACTIVADO</h2>
+            <p style="color:#94a3b8; font-size:0.9rem;">Calibrando simulacion de fisica...</p>
+            
+            <input type="text" id="codigoAlumno" placeholder="CODIGO AGENTE (Ej: ALUM-01)">
+            
+            <div class="input-group">
+                <input type="number" id="edadAlumno" placeholder="EDAD" min="10" max="20">
+                <input type="number" id="gradoAlumno" placeholder="GRADO (Ej: 5)">
+            </div>
+            <input type="text" id="seccionAlumno" placeholder="SECCION (Ej: A o B)" maxlength="2" style="width:95%;">
+            
+            <button class="btn btn-comenzar" onclick="iniciarEncuesta()">INICIAR MISION</button>
         </div>
 
         <div id="encuesta" style="display: none;">
             <div class="progress-bar"><div class="progress" id="barraProgreso"></div></div>
-            <h2 id="numPregunta">Pregunta 1/10</h2>
-            <p class="enunciado" id="textoPregunta">Cargando...</p>
+            <h2 id="numPregunta">NIVEL 1/10</h2>
+            <p class="enunciado" id="textoPregunta">Cargando datos espaciales...</p>
             
             <div id="opciones"></div>
 
-            <button id="btnAyuda" class="btn btn-ayuda" onclick="pedirAyuda()">Necesito reforzar este tema</button>
+            <button id="btnPista" class="btn btn-pista" onclick="mostrarPista()">Escanear Pista de Teoria</button>
+            <div id="textoPista" class="caja-pista"></div>
+
+            <button id="btnAyuda" class="btn btn-ayuda" onclick="pedirAyuda()">Solicitar Refuerzo a la Base</button>
         </div>
     </div>
 
     <script>
-        // --- BASE DE DATOS LOCAL (Preguntas) ---
+        // ==========================================
+        // 1. SISTEMA DE AUDIO (MÚSICA CONTINUA)
+        // ==========================================
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        let audioCtx;
+        let ambientOsc;
+
+        function iniciarMusicaFondo() {
+            if (!audioCtx) audioCtx = new AudioContext();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            
+            // Sonido de fondo continuo tipo "nave espacial"
+            ambientOsc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            
+            ambientOsc.type = 'sine';
+            ambientOsc.frequency.value = 65.41; // Nota muy grave y sostenida
+            
+            gainNode.gain.value = 0.05; // Volumen bajo
+            
+            ambientOsc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            ambientOsc.start();
+        }
+
+        function reproducirSonido(tipo) {
+            if (!audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            if (tipo === 'correcto') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(1760, audioCtx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+            } else if(tipo === 'error') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(110, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+            }
+        }
+
+        // ==========================================
+        // 2. CONFIGURACIÓN DE FIREBASE
+        // ==========================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyCqFn0ikCS4VU9rsL6hOWVrdJTkSc2WLx0",
+            authDomain: "fisica-ia.firebaseapp.com",
+            databaseURL: "https://fisica-ia-default-rtdb.firebaseio.com",
+            projectId: "fisica-ia",
+            storageBucket: "fisica-ia.firebasestorage.app",
+            messagingSenderId: "415579192170",
+            appId: "1:415579192170:web:b20da9b79416ae85a4c313"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // ==========================================
+        // 3. BASE DE DATOS DE PREGUNTAS (Con nuevas pistas)
+        // ==========================================
         const preguntas = [
-            {
-                texto: "Si duplicas la fuerza aplicada a una masa constante, ¿qué sucede con la aceleración?",
-                opciones: ["Se reduce a la mitad", "Se duplica", "Se cuadruplica", "Permanece igual"],
-                respuestaCorrecta: 1 // Índice del arreglo (0, 1, 2, 3)
+            { 
+                texto: "¿Cual es la principal diferencia entre la fisica clasica y la moderna?", 
+                opciones: ["La clasica no usa matematicas", "La moderna estudia fenomenos a velocidad de la luz o nivel atomico", "La moderna rechaza la gravedad", "Son lo mismo"], 
+                respuestaCorrecta: 1, pista: "La fisica moderna nace con Einstein (relatividad) y la cuantica (cosas minusculas)."
             },
-            // Aquí agregaremos las otras 9
+            { 
+                texto: "En mediciones, ¿cual es la diferencia entre Exactitud y Precision?", 
+                opciones: ["Son sinonimos", "Exactitud es acertar al centro real; Precision es que tus medidas sean iguales entre si", "Precision es el valor real", "Solo aplica a vectores"], 
+                respuestaCorrecta: 1, pista: "Imagina un blanco de dardos: Exactitud es dar en el rojo. Precision es que todos tus dardos caigan juntos (aunque sea fuera del rojo)."
+            },
+            { 
+                texto: "Segun el Sistema Internacional (SI), ¿que magnitud fisica fundamental se mide en kilogramos?", 
+                opciones: ["El peso", "La fuerza", "La masa", "La densidad"], 
+                respuestaCorrecta: 2 
+            },
+            { 
+                texto: "¿Cual de las siguientes es una magnitud derivada?", 
+                opciones: ["El tiempo", "La temperatura", "La longitud", "La velocidad"], 
+                respuestaCorrecta: 3, pista: "AYUDA DE TEORIA: Las magnitudes fundamentales son 7 (Masa, Longitud, Tiempo, Temperatura, etc.). Las derivadas nacen al combinar estas fundamentales. Por ejemplo, la velocidad combina longitud y tiempo."
+            },
+            { 
+                texto: "En el analisis dimensional, ¿cual es la ecuacion dimensional correcta para el AREA?", 
+                opciones: ["L", "L²", "M L", "L T"], 
+                respuestaCorrecta: 1, pista: "AYUDA DE DIMENSIONES: El area de un cuadrado es Lado x Lado. Si un lado se mide en Longitud (L)... debes multiplicar L por L."
+            },
+            { 
+                texto: "La ecuacion dimensional de la VELOCIDAD se expresa como:", 
+                opciones: ["L T⁻¹", "L T⁻²", "M L T", "L²"], 
+                respuestaCorrecta: 0, pista: "AYUDA DE DIMENSIONES: Velocidad = Distancia / Tiempo. Distancia es Longitud (L) y Tiempo es (T). En analisis dimensional, al subir la (T) del denominador, su exponente cambia de signo."
+            },
+            { 
+                texto: "Al graficar un vector, ¿que elemento nos indica especificamente hacia donde apunta (la cabeza de la flecha)?", 
+                opciones: ["El modulo", "El origen", "La direccion", "El sentido"], 
+                respuestaCorrecta: 3 
+            },
+            { 
+                texto: "Si dos vectores paralelos apuntan en el MISMO sentido y miden 3u y 4u. ¿Cual es su resultante?", 
+                opciones: ["1 u", "5 u", "7 u", "12 u"], 
+                respuestaCorrecta: 2 
+            },
+            { 
+                texto: "Dos vectores miden 5u y 5u, pero apuntan en sentidos OPUESTOS. La resultante es:", 
+                opciones: ["10 u", "25 u", "0 u", "5 u"], 
+                respuestaCorrecta: 2 
+            },
+            { 
+                texto: "Si dos vectores son PERPENDICULARES (90°) y miden 3u y 4u. ¿Cual es su vector resultante?", 
+                opciones: ["7 u", "1 u", "12 u", "5 u"], 
+                respuestaCorrecta: 3, pista: "Como forman 90 grados, debes usar el Teorema de Pitagoras: R² = A² + B²"
+            }
         ];
 
-        // --- VARIABLES DE MÉTRICAS ---
         let preguntaActual = 0;
         let tiempoInicioPregunta = 0;
         let intentosEnPreguntaActual = 0;
         let temporizadorAyuda;
-        let alumnoID = "";
+        
+        let perfilAlumno = { codigo: "", edad: "", grado: "", seccion: "" };
 
+        // ==========================================
+        // 4. CONTROLADOR DE LA MISIÓN
+        // ==========================================
         function iniciarEncuesta() {
-            alumnoID = document.getElementById("codigoAlumno").value;
-            if(!alumnoID) return alert("Por favor ingresa tu código");
+            perfilAlumno.codigo = document.getElementById("codigoAlumno").value.trim();
+            perfilAlumno.edad = document.getElementById("edadAlumno").value.trim();
+            perfilAlumno.grado = document.getElementById("gradoAlumno").value.trim();
+            perfilAlumno.seccion = document.getElementById("seccionAlumno").value.trim().toUpperCase();
+            
+            if(!perfilAlumno.codigo || !perfilAlumno.edad || !perfilAlumno.grado || !perfilAlumno.seccion) {
+                abrirModal('Error', "FALTAN DATOS", "Agente, debe ingresar codigo, edad, grado y seccion para continuar.");
+                return;
+            }
+            
+            iniciarMusicaFondo(); 
             
             document.getElementById("inicio").style.display = "none";
             document.getElementById("encuesta").style.display = "block";
+            
             cargarPregunta();
         }
 
         function cargarPregunta() {
-            // Reiniciar métricas para esta pregunta
             tiempoInicioPregunta = Date.now();
             intentosEnPreguntaActual = 0;
-            document.getElementById('btnAyuda').style.display = 'none';
             
-            // Mostrar botón de ayuda tras 45 segundos (45000 ms)
-            clearTimeout(temporizadorAyuda);
-            temporizadorAyuda = setTimeout(() => {
-                document.getElementById('btnAyuda').style.display = 'block';
-            }, 45000);
+            document.getElementById('btnAyuda').style.display = 'none';
+            document.getElementById('textoPista').style.display = 'none';
+            document.getElementById('opciones').style.pointerEvents = 'auto'; 
 
-            // Renderizar la interfaz
             const q = preguntas[preguntaActual];
-            document.getElementById("numPregunta").innerText = `Pregunta ${preguntaActual + 1} de ${preguntas.length}`;
+            document.getElementById("numPregunta").innerText = `NIVEL ${preguntaActual + 1} / ${preguntas.length}`;
             document.getElementById("textoPregunta").innerText = q.texto;
             document.getElementById("barraProgreso").style.width = `${((preguntaActual) / preguntas.length) * 100}%`;
 
+            const btnPista = document.getElementById("btnPista");
+            if(q.pista) {
+                btnPista.style.display = "block";
+                document.getElementById("textoPista").innerText = q.pista;
+            } else {
+                btnPista.style.display = "none";
+            }
+
+            clearTimeout(temporizadorAyuda);
+            temporizadorAyuda = setTimeout(() => {
+                document.getElementById('btnAyuda').style.display = 'block';
+            }, 45000); 
+
             const divOpciones = document.getElementById("opciones");
             divOpciones.innerHTML = "";
-            
             q.opciones.forEach((opcion, index) => {
                 let btn = document.createElement("button");
                 btn.className = "btn";
                 btn.innerText = opcion;
-                btn.onclick = () => evaluarRespuesta(index);
+                btn.onclick = () => evaluarRespuesta(index, btn);
                 divOpciones.appendChild(btn);
             });
         }
 
-        function evaluarRespuesta(indexSeleccionado) {
-            intentosEnPreguntaActual++;
-            let tiempoConsumido = (Date.now() - tiempoInicioPregunta) / 1000; // en segundos
-            const q = preguntas[preguntaActual];
-            
-            let esCorrecta = (indexSeleccionado === q.respuestaCorrecta);
+        function mostrarPista() {
+            document.getElementById("textoPista").style.display = "block";
+            document.getElementById("btnPista").style.display = "none";
+        }
 
-            // AQUÍ: Guardar data en Firebase (alumnoID, preguntaActual, tiempoConsumido, intentosEnPreguntaActual, esCorrecta)
-            console.log(`Guardando: Alumno ${alumnoID} | P${preguntaActual+1} | Tiempo: ${tiempoConsumido}s | Intentos: ${intentosEnPreguntaActual} | Éxito: ${esCorrecta}`);
+        // ==========================================
+        // FUNCIONES DE MODALES
+        // ==========================================
+        function abrirModal(tipo, titulo = null, texto = null) {
+            const modal = document.getElementById(`modal${tipo}`);
+            const caja = document.getElementById(`modalCaja${tipo}`);
+            
+            if(titulo && texto) {
+                caja.querySelector("h3").innerText = titulo;
+                caja.querySelector("p").innerText = texto;
+            }
+
+            modal.style.display = 'flex';
+            setTimeout(() => { modal.style.opacity = '1'; caja.style.transform = 'scale(1)'; }, 10);
+        }
+
+        function cerrarModal(tipo) {
+            const modal = document.getElementById(`modal${tipo}`);
+            const caja = document.getElementById(`modalCaja${tipo}`);
+            modal.style.opacity = '0'; caja.style.transform = 'scale(0.8)';
+            setTimeout(() => { modal.style.display = 'none'; }, 300);
+        }
+
+        function cerrarModalYAvanzar() {
+            cerrarModal('Refuerzo');
+            avanzarSiguiente();
+        }
+
+        // ==========================================
+        // EVALUACIÓN Y ENVÍO A FIREBASE
+        // ==========================================
+        function evaluarRespuesta(indexSeleccionado, botonElement) {
+            intentosEnPreguntaActual++;
+            let tiempoConsumido = (Date.now() - tiempoInicioPregunta) / 1000;
+            const q = preguntas[preguntaActual];
+            let esCorrecta = (indexSeleccionado === q.respuestaCorrecta);
+            const card = document.getElementById("app-container");
+
+            let datos = {
+                alumno: perfilAlumno.codigo,
+                edad: perfilAlumno.edad,
+                grado: perfilAlumno.grado,
+                seccion: perfilAlumno.seccion,
+                pregunta_nro: preguntaActual + 1,
+                acierto: esCorrecta,
+                tiempo_segundos: parseFloat(tiempoConsumido.toFixed(2)),
+                intentos: intentosEnPreguntaActual,
+                pidio_ayuda: false,
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+            };
+            database.ref('dataset_fisica/' + perfilAlumno.codigo).push(datos);
 
             if (esCorrecta) {
-                avanzarSiguiente();
+                reproducirSonido("correcto");
+                botonElement.style.background = "linear-gradient(45deg, #00ff88, #00d2ff)";
+                botonElement.style.color = "#000";
+                botonElement.style.boxShadow = "0 0 20px #00ff88";
+                document.getElementById('opciones').style.pointerEvents = 'none'; 
+                
+                setTimeout(() => { avanzarSiguiente(); }, 1200);
             } else {
-                alert("Respuesta incorrecta. Analízalo de nuevo.");
+                reproducirSonido("error");
+                botonElement.style.borderColor = "#ef4444";
+                botonElement.style.color = "#ef4444";
+                botonElement.style.boxShadow = "inset 0 0 10px rgba(239, 68, 68, 0.2)";
+                
+                card.classList.remove("shake"); 
+                void card.offsetWidth; 
+                card.classList.add("shake");
+                
+                abrirModal('Error', 'ALERTA DE SISTEMA', 'Esa no es la respuesta correcta. Reagrupa tus datos, revisa la teoria y sigue intentandolo.');
             }
         }
 
         function pedirAyuda() {
-            let latenciaAyuda = (Date.now() - tiempoInicioPregunta) / 1000;
-            console.log(`Guardando: Alumno ${alumnoID} | P${preguntaActual+1} | PIDIÓ AYUDA a los ${latenciaAyuda}s`);
-            avanzarSiguiente();
+            let tiempoConsumido = (Date.now() - tiempoInicioPregunta) / 1000;
+            let datos = {
+                alumno: perfilAlumno.codigo,
+                edad: perfilAlumno.edad,
+                grado: perfilAlumno.grado,
+                seccion: perfilAlumno.seccion,
+                pregunta_nro: preguntaActual + 1,
+                acierto: false,
+                tiempo_segundos: parseFloat(tiempoConsumido.toFixed(2)),
+                intentos: intentosEnPreguntaActual,
+                pidio_ayuda: true,
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+            };
+            database.ref('dataset_fisica/' + perfilAlumno.codigo).push(datos);
+            
+            // Abre el modal de refuerzo (el cual llama a avanzarSiguiente al darle clic)
+            abrirModal('Refuerzo');
         }
 
         function avanzarSiguiente() {
@@ -180,8 +447,10 @@
             if (preguntaActual < preguntas.length) {
                 cargarPregunta();
             } else {
-                document.getElementById("encuesta").innerHTML = "<h2>¡Desafío Completado!</h2><p>Tus respuestas han sido enviadas. Excelente trabajo.</p>";
+                document.getElementById("encuesta").innerHTML = "<h2 style='color:#00ff88;'>MISION CUMPLIDA</h2><p style='color:#f8fafc;'>Datos sincronizados con la Base de IA. Excelente trabajo, agente.</p>";
                 document.getElementById("barraProgreso").style.width = "100%";
+                reproducirSonido("correcto");
+                if(ambientOsc) ambientOsc.stop(); 
             }
         }
     </script>
